@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>  
+<html lang="zh">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>看盘专栏</title>  
+    <meta http-equiv="refresh" content="5"> <!-- 添加这一行，设置页面每5秒自动刷新 -->
+    <style>  
+        body {  
+            background: linear-gradient(135deg, #1a1a1a, #333);  
+            color: #e0e0e0;  
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
+            margin: 0px;  
+            padding: 0px;  
+            font-size: 13px;  
+        }  
+        #container {  
+            width: 980px;  
+            margin: 0px;  
+            overflow: hidden;  
+        }  
+        #left-container {  
+            /*background-color: rgba(42, 42, 42, 0.9);  */
+            padding: 0px;  
+            width: 240px;  
+            float: left;  
+            margin: 0px;  
+        }  
+        #right-container {  
+            /*background-color: rgba(42, 42, 42, 0.9);  */
+            padding: 0px;  
+            width: 420px;  
+            float: left;  
+            margin-left: 2px;  
+        }  
+        .header-container {  
+            margin-bottom: 10px;  
+            display: flex;  
+            justify-content: space-between;  
+            align-items: center;  
+        }  
+        #buttons {  
+            display: flex;  
+            gap: 10px;  
+        }  
+        button {  
+            padding: 6px 12px;  
+            background: linear-gradient(35deg, #800020, #601010);  
+            color: white;  
+            border: none;  
+            border-radius: 8px;  
+            cursor: pointer;  
+            transition: background 0.3s, transform 0.2s;  
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);  
+        }  
+        button:hover {  
+            background: linear-gradient(135deg, #601010, #800020);  
+            transform: translateY(-2px);  
+        }  
+        table {  
+            width: 100%;  
+            border-collapse: collapse;  
+            margin-top: 0px;  
+            table-layout: fixed; /* Use fixed table layout */  
+        }  
+        th, td {  
+            border: 1px solid #555;  
+            padding: 0px;  
+            color: #d2d2d3;  
+            text-align: left;  
+            white-space: nowrap;  
+            overflow: hidden;  
+            text-overflow: ellipsis;  
+        }  
+        th {  
+            background-color: #2b2b2b;  
+            color: #ddd;  
+            font-weight: bold;  
+            font-size: 18px;  
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);  
+            border-bottom: 2px solid #444;  
+            padding: 0px 2px;  
+            text-transform: uppercase;  
+            border-radius: 10px 10px 0 0;  
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);  
+        }  
+        th:hover {  
+            background-color: #3a3a3a;  
+        }  
+        /*
+        tr:nth-child(even) {  
+            background-color: #2a2a2a;  
+        }  
+        */
+        tr:hover {  
+            background-color: #444;  
+        }  
+        ::-webkit-scrollbar {  
+            width: 8px;  
+        }  
+        ::-webkit-scrollbar-track {  
+            background: #2a2a2a;  
+        }  
+        ::-webkit-scrollbar-thumb {  
+            background: #555;  
+            border-radius: 4px;  
+        }  
+        * {  
+            scrollbar-width: thin;  
+            scrollbar-color: #555 #2a2a2a;  
+        }  
+        .highlight-limit-up {  
+            color: orange;  
+            font-weight: bold;  
+        }  
+        a {  
+            color: inherit;  
+            text-decoration: none;  
+        }      
+        #plate-table th:nth-child(1), #plate-table td:nth-child(1) {  
+            width: 35px;  
+        }  
+        #plate-table th:nth-child(2), #plate-table td:nth-child(2) {  
+            width: 20px;  
+        }  
+        #plate-table th:nth-child(3), #plate-table td:nth-child(3) {  
+            width: 20px;  
+        }   
+        #plate-table th:nth-child(4), #plate-table td:nth-child(4) {  
+            width: 15px;  
+        }  
+        #data-table th:nth-child(1), #data-table td:nth-child(1)  {  
+            width: 60px; 
+        }         
+        #data-table th:nth-child(2), #data-table td:nth-child(2),  
+        #data-table th:nth-child(3), #data-table td:nth-child(3) {  
+            width: 45px;  
+        }  
+        #data-table th:nth-child(4), #data-table td:nth-child(4) {  
+            width: 150px;  
+        }  
+        #data-table th:nth-child(5), #data-table td:nth-child(5) {  
+            width: 40px;  
+        }  
+        #data-table th:nth-child(6), #data-table td:nth-child(6) {  
+            width: 60px;  
+        }  
+    </style>  
+   
+</head>  
+<body>  
+    <div id="container">  
+        <!-- Left Container -->  
+        <div id="left-container">            
+            <table id="plate-table">  
+                <thead>  
+                    <tr>  
+                        <th>名称</th>  
+                        <th>强度</th>  
+                        <th>涨幅%</th>  
+                        <th>涨停</th>  
+                    </tr>  
+                </thead>  
+                <tbody id="plate-table-body">  
+                </tbody>  
+            </table>  
+        </div>  
+
+        <!-- Right Container -->  
+        <div id="right-container">  
+            <table id="data-table">  
+                <thead>  
+                    <tr>  
+                        <th>股票名称</th>  
+                        <th>价格</th>  
+                        <th>涨幅</th>  
+                        <th>概念</th>  
+                        <th>状态</th>  
+                        <th>连板</th>  
+                    </tr>  
+                </thead>  
+                <tbody id="data-table-body">  
+                </tbody>  
+            </table>  
+        </div>  
+    </div>  
+    
+        <script>
+        function updateDateTime() {
+            const now = new Date();
+            const dateTimeStr = now.toLocaleString();
+            document.getElementById('current-time').textContent = dateTimeStr;
+        }
+
+        // 每隔一秒更新一次日期时间
+        setInterval(updateDateTime, 1000);
+        </script> 
+
+    <script>  
+        const plateApiUrl = 'https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=RealRankingInfo&st=30&apiv=w21&Type=1&c=ZhiShuRanking&PhoneOSNew=1&VerSion=5&ZSType=7&';  
+        let platesList = [];  
+        let calculatedPlates = new Set();  
+        let currentPlateName = '';  
+        
+        async function fetchPlates() {  
+            try {  
+                const response = await fetch(plateApiUrl);  
+                const data = await response.json();  
+                platesList = data.list.slice(0, 30);  
+                platesList = platesList.filter(item => item[1] !== "ST板块"); 
+                updatePlateTable();  
+                if (platesList.length > 0) {  
+                    displayComponentStocks(platesList[0][0]);  
+                    setActivePlate(0);  
+                    currentPlateName = platesList[0][1];  
+                    for (let i = 0; i < 10 && i < platesList.length; i++) {  
+                        calculateLimitUpCount(platesList[i][0], i,  platesList[i][1]);   
+                        calculatedPlates.add(i);  
+                    }  
+                }  
+            } catch (error) {  
+                console.error("获取板块数据失败:", error);  
+            }  
+        }  
+
+        function updatePlateTable() {  
+            const plateTableBody = document.getElementById('plate-table-body');  
+            plateTableBody.innerHTML = "";  
+
+            platesList.forEach((item, index) => {  
+                const row = plateTableBody.insertRow();  
+                const cell1 = row.insertCell(0);  
+                const cell2 = row.insertCell(1);  
+                const cell3 = row.insertCell(2);  
+                const cell4 = row.insertCell(3);  
+
+                cell1.innerText = item[1];  
+                cell2.innerText = item[2];  
+                cell3.innerText = parseFloat(item[3]).toFixed(2);  
+                cell4.innerText = ' ';  
+
+                row.onclick = () => {  
+                    displayComponentStocks(item[0]);  
+                    setActivePlate(index);  
+                    currentPlateName = item[1];  
+                    calculateLimitUpCount(item[0], index, item[1]);  
+                    calculatedPlates.add(index);    
+                };  
+            });  
+        }  
+
+        async function displayComponentStocks(plateID) {  
+            const baseUrl = `https://apphq.longhuvip.com/w1/api/index.php?Order=1&st=60&a=ZhiShuStockList_W8&c=ZhiShuRanking&PhoneOSNew=1&apiv=W21&Type=6&PlateID=${plateID}`;  
+            let allStocks = [];  
+            let index = 0;  
+            let hasMoreData = true;  
+
+            try {  
+                while (hasMoreData) {  
+                    const stockApiUrl = `${baseUrl}&Index=${index}`;  
+                    const response = await fetch(stockApiUrl);  
+                    const data = await response.json();  
+                    const stocksList = data.list || [];  
+
+                    if (stocksList.length > 0) {  
+                        allStocks = allStocks.concat(stocksList);  
+                        index += stocksList.length;  
+                    } else {  
+                        hasMoreData = false;  
+                    }  
+                }  
+
+                const tableBody = document.getElementById('data-table-body');  
+                tableBody.innerHTML = "";  
+
+                const chineseNumerals = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十"];  
+
+                allStocks.forEach(item => {  
+                    const row = tableBody.insertRow();  
+                    row.setAttribute('data-stock-code', item[0]); // Set the data attribute directly  
+
+                    const cell1 = row.insertCell(0);  
+                    const cell2 = row.insertCell(1);  
+                    const cell3 = row.insertCell(2);  
+                    const cell4 = row.insertCell(3);  
+                    const cell5 = row.insertCell(4);  
+                    const cell6 = row.insertCell(5);  
+
+                    const stockCode = item[0];  
+                    const stockName = item[1] || '';  
+                    const stockUrl = `http://www.treeid/code_${stockCode}`;  
+
+                    cell1.innerText = stockName;  
+					let stockCodePre = stockCode.substring(0,2);
+					if(stockCodePre =="30"){
+						cell1.style.color = "red";
+					}
+                    cell2.innerText = item[5] ? item[5].toFixed(2) : '';  
+                    cell3.innerText = item[6] !== undefined ? (item[6] ? item[6].toFixed(2) + '%' : '') : '';  
+					if(item[6]>9 && item[6]<11){
+						cell3.style.color = "red";
+					}else if(item[6]>19){
+						cell3.style.color = "deeppink";
+					}
+                    cell4.innerText = item[4] || '';  
+                    cell5.innerText = item[24] || '';  
+                    cell6.innerText = item[23] || '';  
+
+                    row.style.cursor = 'pointer';  
+                    row.addEventListener('click', () => {  
+                        window.location.href = stockUrl;  
+                    });  
+
+                     if (item[23] && !item[23].includes('昨')) { // Highlight if relevant  
+                        cell6.classList.add('highlight-limit-up');  
+                    }  
+                });  
+
+                if (allStocks.length === 0) {  
+                    const row = tableBody.insertRow();  
+                    const cell = row.insertCell(0);  
+                    cell.colSpan = 6;  
+                    cell.innerText = "没有找到股票数据";  
+                }  
+
+            } catch (error) {  
+                console.error("获取股票数据失败:", error);  
+            }  
+        }  
+
+        async function calculateLimitUpCount(plateID, plateIndex, plateName) {  
+            const baseUrl = `https://apphq.longhuvip.com/w1/api/index.php?Order=1&st=60&a=ZhiShuStockList_W8&c=ZhiShuRanking&PhoneOSNew=1&apiv=W21&Type=6&PlateID=${plateID}`;  
+            let allStocks = [];  
+            let index = 0;  
+            let hasMoreData = true;  
+
+            try {  
+                while (hasMoreData) {  
+                    const stockApiUrl = `${baseUrl}&Index=${index}`;  
+                    const response = await fetch(stockApiUrl);  
+                    const data = await response.json();  
+                    const stocksList = data.list || [];  
+
+                    if (stocksList.length > 0) {  
+                        allStocks = allStocks.concat(stocksList);  
+                        index += stocksList.length;  
+                    } else {  
+                        hasMoreData = false;  
+                    }  
+                }  
+
+                let limitUpCount = 0;  
+                const chineseNumerals = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十"];  
+
+                allStocks.forEach(item => {  
+                    const stockName = item[1] || '';  
+                    const lianBanContent = item[23] || '';  
+                    const priceChange = item[6] || 0;  
+
+                    if (plateName === "北交所") {  
+                        // For 北交所, count stocks with a price increase of 29.9% or more  
+                        if (priceChange >= 29.9 && !stockName.toLowerCase().includes('st')) {  
+                            limitUpCount++;  
+                        }  
+                    } else {  
+                        // For other plates, use the 连板 logic  
+                        if (lianBanContent && !lianBanContent.includes('昨') && !stockName.toLowerCase().includes('st')) {  
+                            limitUpCount++;  
+                        }  
+                    }  
+                });  
+
+                const plateRow = document.querySelectorAll('#plate-table-body tr')[plateIndex];  
+                if (plateRow) {  
+                    const limitUpCell = plateRow.cells[3];  
+                    limitUpCell.innerText = limitUpCount;  
+                }  
+
+            } catch (error) {  
+                console.error("获取股票数据失败:", error);  
+            }  
+        }  
+
+        function setActivePlate(index) {  
+            const plateRows = document.querySelectorAll('#plate-table-body tr');  
+            plateRows.forEach((row, i) => {  
+                if (i === index) {  
+                    row.style.backgroundColor = '#470024';  
+                } else {  
+                    row.style.backgroundColor = '';  
+                }  
+            });  
+        }  
+
+        fetchPlates();  
+    </script>  
+</body>  
+</html>
